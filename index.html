@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Palkkaran Shop | Fresh milk &amp; dairy delivered</title>
+<meta name="description" content="Order fresh farm milk, ghee and dairy products from Palkkaran online.">
+<meta name="theme-color" content="#6c5cf5">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%236c5cf5'/%3E%3Cpath d='M16 6s-7 8-7 12.5a7 7 0 0 0 14 0C23 14 16 6 16 6z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--violet:#6c5cf5;--violet-600:#5a48e8;--violet-700:#4430c9;--ink:#1e1652;--ink-soft:#4d4675;--muted:#7b75a0;--milk:#fffdf8;--lav:#efecff;--lav-2:#e2ddff;--line:rgba(30,22,82,.1);--ok:#16a34a;--bad:#dc2626;--r:18px}
+*{box-sizing:border-box}body{margin:0;font-family:"Plus Jakarta Sans","Noto Sans Malayalam",system-ui,sans-serif;color:var(--ink-soft);background:var(--milk);line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:Fredoka,"Noto Sans Malayalam",system-ui,sans-serif;color:var(--ink);margin:0 0 .4em;line-height:1.15}
+a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}img{max-width:100%;display:block}
+.wrap{width:min(100% - 32px,1180px);margin-inline:auto}
+header{position:sticky;top:0;z-index:20;background:rgba(255,253,248,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:14px;height:66px}
+.logo{display:flex;align-items:center;gap:8px;font:600 22px Fredoka,sans-serif;color:var(--ink)}
+.logo i{width:32px;height:32px;border-radius:10px;background:var(--violet);display:grid;place-items:center}
+.logo svg{width:18px;fill:#fff}
+.nav{margin-left:auto;display:flex;align-items:center;gap:6px}
+.nav a.l{padding:8px 12px;font-weight:600;font-size:15px;border-radius:999px}.nav a.l:hover{background:var(--lav)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:11px 20px;font-weight:700;background:var(--violet);color:#fff;cursor:pointer;transition:.2s}
+.btn:hover{background:var(--violet-600)}.btn.ghost{background:var(--lav);color:var(--violet-700)}.btn.ghost:hover{background:var(--lav-2)}
+.btn.sm{padding:7px 14px;font-size:14px}.btn[disabled]{opacity:.5;cursor:not-allowed}.btn.block{width:100%}
+.cartbtn{position:relative}.badge{background:#fff;color:var(--violet-700);border-radius:99px;min-width:22px;height:22px;display:inline-grid;place-items:center;font-size:12px;padding:0 6px}
+.hero{padding:34px 0 8px}.hero h1{font-size:clamp(28px,5vw,44px)}.hero p{max-width:560px;color:var(--muted)}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:18px 0}
+.search{flex:1;min-width:200px;padding:12px 16px;border-radius:999px;border:1.5px solid var(--lav-2);background:#fff}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.chip{white-space:nowrap;padding:8px 16px;border-radius:999px;background:#fff;border:1.5px solid var(--lav-2);font-weight:600;cursor:pointer;font-size:14px;color:var(--ink-soft)}
+.chip.on{background:var(--violet);border-color:var(--violet);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px;margin:12px 0 60px}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 24px -16px rgba(30,22,82,.3)}
+.card .im{aspect-ratio:1;background:var(--lav);display:grid;place-items:center;overflow:hidden}.card .im img{width:100%;height:100%;object-fit:cover}
+.card .im span{font-size:46px}
+.card .b{padding:14px;display:flex;flex-direction:column;gap:6px;flex:1}.card h3{font-size:17px;margin:0}.unit{font-size:13px;color:var(--muted)}
+.pr{display:flex;align-items:baseline;gap:8px;margin-top:auto}.pr b{font-size:19px;color:var(--ink)}.pr s{color:var(--muted);font-size:14px}.off{color:var(--ok);font-weight:700;font-size:12px}
+.qty{display:flex;align-items:center;justify-content:space-between;background:var(--lav);border-radius:999px;padding:3px}
+.qty button{width:34px;height:34px;border-radius:50%;border:0;background:var(--violet);color:#fff;font-size:20px;cursor:pointer;line-height:1}
+.oos{color:var(--bad);font-weight:700;font-size:13px}
+.empty{padding:60px 0;text-align:center;color:var(--muted)}
+.overlay{position:fixed;inset:0;background:rgba(30,22,82,.45);z-index:40;display:none}.overlay.show{display:block}
+.panel{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:#fff;z-index:50;transform:translateX(105%);transition:.3s;display:flex;flex-direction:column}
+.panel.show{transform:none}.panel .hd{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
+.panel .bd{padding:18px 20px;overflow:auto;flex:1}.panel .ft{padding:16px 20px;border-top:1px solid var(--line)}
+.x{background:none;border:0;font-size:26px;cursor:pointer;color:var(--ink)}
+.line{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.line .n{flex:1;font-weight:600;color:var(--ink)}
+.row{display:flex;justify-content:space-between;padding:4px 0}.row.t{font-weight:800;color:var(--ink);font-size:18px;border-top:1px dashed var(--line);margin-top:6px;padding-top:10px}
+label{display:block;font-weight:600;font-size:14px;color:var(--ink);margin:12px 0 4px}
+input[type=text],input[type=tel],input[type=number],input[type=date],select,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--lav-2);background:#fff}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--violet);border-color:transparent}
+.msg{padding:10px 14px;border-radius:12px;margin:10px 0;font-size:14px}.msg.e{background:#fee2e2;color:#991b1b}.msg.o{background:#dcfce7;color:#166534}.msg.i{background:var(--lav);color:var(--violet-700)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:999px;z-index:80;transition:.3s;font-weight:600}.toast.show{transform:translateX(-50%)}
+.skel{height:300px;border-radius:var(--r);background:linear-gradient(90deg,#f3f0ff,#fff,#f3f0ff);background-size:200% 100%;animation:sk 1.2s infinite}@keyframes sk{to{background-position:-200% 0}}
+footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:14px}
+.modal{position:fixed;inset:0;display:none;place-items:center;z-index:60;padding:16px}.modal.show{display:grid}.modal .box{background:#fff;border-radius:22px;padding:24px;width:min(460px,100%);max-height:92vh;overflow:auto}
+@media(max-width:640px){.nav a.l{display:none}.grid{grid-template-columns:repeat(2,1fr);gap:12px}.card h3{font-size:15px}}
+</style>
+</head>
+<body>
+<header><div class="wrap bar">
+  <a class="logo" href="https://www.palkkaran.in"><i><svg viewBox="0 0 24 24"><path d="M12 2.5S5 10.2 5 14.6A7 7 0 0 0 19 14.6C19 10.2 12 2.5 12 2.5Z"/></svg></i>Palkkaran</a>
+  <nav class="nav">
+    <a class="l" href="https://www.palkkaran.in">Home</a>
+    <a class="l" href="#" id="ordersLink" style="display:none">My orders</a>
+    <a class="l" href="#" id="loginLink">Login</a>
+    <button class="btn cartbtn" id="cartOpen">🛒 Cart <span class="badge" id="cartN">0</span></button>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <section class="hero"><h1>Palkkaran Shop</h1><p>Farm-fresh milk, ghee and dairy. Add to cart, log in with your mobile number and we deliver to your doorstep.</p></section>
+  <div class="tools"><input class="search" id="q" type="search" placeholder="Search products…"></div>
+  <div class="chips" id="chips"></div>
+  <div class="grid" id="grid"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+</main>
+<footer><div class="wrap">© Palkkaran · <a href="https://www.palkkaran.in/contact.html" style="text-decoration:underline">Contact</a> · Want daily subscriptions? <a style="text-decoration:underline" href="https://play.google.com/store/apps/details?id=com.tecnavis.palkkaran">Get the app</a></div></footer>
+
+<div class="overlay" id="ov"></div>
+
+<aside class="panel" id="cart" aria-label="Cart">
+  <div class="hd"><h2 style="margin:0">Your cart</h2><button class="x" data-close>&times;</button></div>
+  <div class="bd" id="cartBody"></div>
+  <div class="ft" id="cartFt"></div>
+</aside>
+
+<div class="modal" id="authM"><div class="box">
+  <div style="display:flex;justify-content:space-between"><h2 id="authT">Login</h2><button class="x" data-closem>&times;</button></div>
+  <div id="authB"></div>
+</div></div>
+
+<div class="modal" id="ordM"><div class="box">
+  <div style="display:flex;justify-content:space-between"><h2>My orders</h2><button class="x" data-closem>&times;</button></div>
+  <div id="ordB"></div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+const API = 'https://api.palkkaran.in/api/v1';
+const $ = s => document.querySelector(s);
+const inr = n => '₹' + (Math.round(n * 100) / 100).toLocaleString('en-IN');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d } catch { return d } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)) } catch {} }, del(k) { try { localStorage.removeItem(k) } catch {} } };
+
+let products = [], cats = [], catId = 0, search = '', cfg = null;
+let cart = store.get('pk_cart', {});         // {product_id: qty}
+let token = store.get('pk_token', null), me = null;
+
+function toast(t) { const e = $('#toast'); e.textContent = t; e.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('show'), 2600); }
+
+async function api(path, { method = 'GET', body, auth = false } = {}) {
+  const h = { Accept: 'application/json' };
+  if (body) h['Content-Type'] = 'application/json';
+  if (auth && token) h.Authorization = 'Bearer ' + token;
+  let r;
+  try { r = await fetch(API + path, { method, headers: h, body: body ? JSON.stringify(body) : undefined }); }
+  catch { throw new Error('Cannot reach the server. Check your internet and try again.'); }
+  let j = null; try { j = await r.json(); } catch {}
+  if (r.status === 401 && auth) { logout(true); throw new Error('Please log in again.'); }
+  if (!r.ok) {
+    const first = j && j.errors ? Object.values(j.errors)[0][0] : null;
+    throw new Error(first || (j && j.message) || 'Something went wrong (' + r.status + ')');
+  }
+  return j;
+}
+
+/* ---------- catalogue ---------- */
+async function loadCatalog() {
+  try {
+    const [c, p, conf] = await Promise.all([api('/customer/catalog/categories'), api('/customer/catalog/products?type=one_time'), api('/config').catch(() => null)]);
+    cats = c.data || c; products = p.data || p; cfg = conf;
+    // drop cart items that no longer exist
+    Object.keys(cart).forEach(id => { if (!products.find(x => x.id == id)) delete cart[id]; });
+    renderChips(); renderGrid(); renderCartN();
+  } catch (e) { $('#grid').innerHTML = '<div class="empty" style="grid-column:1/-1">' + esc(e.message) + '<br><br><button class="btn" onclick="location.reload()">Retry</button></div>'; }
+}
+function renderChips() {
+  const all = [{ id: 0, name: 'All' }, ...cats];
+  $('#chips').innerHTML = all.map(c => `<button class="chip ${c.id === catId ? 'on' : ''}" data-cat="${c.id}">${esc(c.name)}</button>`).join('');
+}
+function renderGrid() {
+  const q = search.trim().toLowerCase();
+  const list = products.filter(p => (!catId || p.category_id === catId) && (!q || (p.name + ' ' + (p.name_ml || '')).toLowerCase().includes(q)));
+  if (!list.length) { $('#grid').innerHTML = '<div class="empty" style="grid-column:1/-1">No products found.</div>'; return; }
+  $('#grid').innerHTML = list.map(p => {
+    const off = p.mrp > p.price ? Math.round((1 - p.price / p.mrp) * 100) : 0;
+    const n = cart[p.id] || 0;
+    return `<article class="card"><div class="im">${p.image ? `<img loading="lazy" src="${esc(p.image)}" alt="${esc(p.name)}">` : '<span>🥛</span>'}</div>
+      <div class="b"><h3>${esc(p.name)}</h3><div class="unit">${esc(p.unit_label || '')}</div>
+      <div class="pr"><b>${inr(p.price)}</b>${off ? `<s>${inr(p.mrp)}</s><span class="off">${off}% off</span>` : ''}</div>
+      ${!p.in_stock ? '<div class="oos">Out of stock</div>' : n ? `<div class="qty"><button data-dec="${p.id}">−</button><b>${n}</b><button data-inc="${p.id}">+</button></div>` : `<button class="btn sm block" data-inc="${p.id}">Add</button>`}
+      </div></article>`;
+  }).join('');
+}
+
+/* ---------- cart ---------- */
+function saveCart() { store.set('pk_cart', cart); renderCartN(); renderGrid(); if ($('#cart').classList.contains('show')) renderCart(); }
+function renderCartN() { $('#cartN').textContent = Object.values(cart).reduce((a, b) => a + b, 0); }
+function inc(id) { cart[id] = Math.min(50, (cart[id] || 0) + 1); saveCart(); }
+function dec(id) { cart[id] = (cart[id] || 0) - 1; if (cart[id] <= 0) delete cart[id]; saveCart(); }
+function subtotal() { return Object.entries(cart).reduce((a, [id, q]) => a + (products.find(p => p.id == id)?.price || 0) * q, 0); }
+function openPanel() { renderCart(); $('#cart').classList.add('show'); $('#ov').classList.add('show'); }
+function closePanel() { $('#cart').classList.remove('show'); $('#ov').classList.remove('show'); }
+function renderCart() {
+  const ids = Object.keys(cart);
+  if (!ids.length) { $('#cartBody').innerHTML = '<div class="empty">Your cart is empty.</div>'; $('#cartFt').innerHTML = ''; return; }
+  $('#cartBody').innerHTML = ids.map(id => { const p = products.find(x => x.id == id); if (!p) return '';
+    return `<div class="line"><div class="n">${esc(p.name)}<div class="unit">${esc(p.unit_label || '')} · ${inr(p.price)}</div></div>
+      <div class="qty" style="min-width:104px"><button data-dec="${id}">−</button><b>${cart[id]}</b><button data-inc="${id}">+</button></div><b>${inr(p.price * cart[id])}</b></div>`; }).join('');
+  $('#cartFt').innerHTML = `<div class="row"><span>Subtotal</span><b>${inr(subtotal())}</b></div><p class="unit" style="margin:4px 0 12px">Delivery fee and offers are shown at checkout.</p>
+    <button class="btn block" id="checkout">${token ? 'Checkout' : 'Login to checkout'}</button>`;
+}
+
+/* ---------- auth ---------- */
+function modal(id, show) { $(id).classList.toggle('show', show); if (show) { closePanel(); } }
+function logout(silent) { token = null; me = null; store.del('pk_token'); updateNav(); if (!silent) toast('Logged out'); }
+function updateNav() {
+  $('#loginLink').textContent = token ? 'Logout' : 'Login';
+  $('#ordersLink').style.display = token ? '' : 'none';
+}
+function authPhone(msg) {
+  $('#authT').textContent = 'Login with mobile';
+  $('#authB').innerHTML = `${msg ? `<div class="msg e">${esc(msg)}</div>` : ''}<label>Mobile number</label><input id="ph" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number">
+    <p class="unit">We will send a one-time password (OTP) by SMS/WhatsApp.</p><button class="btn block" id="sendOtp">Send OTP</button>`;
+  modal('#authM', true);
+}
+async function sendOtp() {
+  const phone = $('#ph').value.replace(/\D/g, '').slice(-10);
+  if (phone.length !== 10) return authPhone('Enter a valid 10-digit mobile number.');
+  const b = $('#sendOtp'); b.disabled = true; b.textContent = 'Sending…';
+  try { const r = await api('/customer/auth/otp', { method: 'POST', body: { phone } }); authOtp(phone, r.is_new); }
+  catch (e) { authPhone(e.message); }
+}
+function authOtp(phone, isNew, msg) {
+  $('#authT').textContent = 'Enter OTP';
+  $('#authB').innerHTML = `${msg ? `<div class="msg e">${esc(msg)}</div>` : '<div class="msg i">OTP sent to +91 ' + esc(phone) + '</div>'}
+    <label>OTP</label><input id="otp" type="text" inputmode="numeric" maxlength="8" autocomplete="one-time-code">
+    ${isNew ? '<label>Your name</label><input id="nm" type="text" maxlength="100" placeholder="Full name">' : ''}
+    <div style="margin-top:14px"><button class="btn block" id="verify" data-phone="${phone}" data-new="${isNew ? 1 : 0}">Verify &amp; continue</button></div>
+    <p style="text-align:center"><a href="#" id="changeNo" style="text-decoration:underline">Change number</a></p>`;
+}
+async function verify() {
+  const b = $('#verify'), phone = b.dataset.phone, isNew = b.dataset.new === '1';
+  const otp = $('#otp').value.trim(), name = isNew ? $('#nm').value.trim() : undefined;
+  if (!otp) return authOtp(phone, isNew, 'Enter the OTP.');
+  if (isNew && !name) return authOtp(phone, isNew, 'Please enter your name.');
+  b.disabled = true; b.textContent = 'Verifying…';
+  try {
+    const r = await api('/customer/auth/verify', { method: 'POST', body: { phone, otp, name, platform: 'web' } });
+    token = r.token; store.set('pk_token', token); me = r.customer.data || r.customer; updateNav(); modal('#authM', false); toast('Logged in');
+    cart && Object.keys(cart).length ? startCheckout() : null;
+  } catch (e) { authOtp(phone, isNew, e.message); }
+}
+
+/* ---------- checkout ---------- */
+async function loadMe() { const r = await api('/customer/me', { auth: true }); me = r.data || r; return me; }
+async function startCheckout() {
+  if (!token) return authPhone();
+  try { await loadMe(); } catch (e) { return toast(e.message); }
+  if (!me.default_address) return addressForm();
+  checkoutView();
+}
+function addressForm(msg, v = {}) {
+  $('#authT').textContent = 'Delivery address';
+  $('#authB').innerHTML = `${msg ? `<div class="msg e">${esc(msg)}</div>` : '<div class="msg i">Add your delivery address to continue.</div>'}
+    ${me && !me.name ? `<label>Your name</label><input id="a_name" type="text" value="${esc(v.name)}">` : ''}
+    <label>House / flat no. &amp; name</label><input id="a_house" type="text" value="${esc(v.house)}">
+    <label>Street / locality</label><input id="a_street" type="text" value="${esc(v.street)}">
+    <label>Landmark (optional)</label><input id="a_land" type="text" value="${esc(v.landmark)}">
+    <label>City</label><input id="a_city" type="text" value="${esc(v.city)}">
+    <label>Pincode</label><input id="a_pin" type="tel" inputmode="numeric" maxlength="6" value="${esc(v.pincode)}">
+    <div style="margin-top:14px"><button class="btn block" id="saveAddr">Save &amp; continue</button></div>`;
+  modal('#authM', true);
+}
+async function saveAddr() {
+  const v = { name: $('#a_name')?.value.trim(), house: $('#a_house').value.trim(), street: $('#a_street').value.trim(), landmark: $('#a_land').value.trim(), city: $('#a_city').value.trim(), pincode: $('#a_pin').value.trim() };
+  if (!v.house || !/^\d{6}$/.test(v.pincode)) return addressForm('House and a 6-digit pincode are required.', v);
+  const b = $('#saveAddr'); b.disabled = true; b.textContent = 'Saving…';
+  try {
+    if (v.name) await api('/customer/me', { method: 'POST', body: { name: v.name }, auth: true });
+    const r = await api('/customer/addresses', { method: 'POST', body: { house: v.house, street: v.street, landmark: v.landmark, city: v.city, pincode: v.pincode, locality: v.street, is_default: true }, auth: true });
+    if (r.serviceable === false) { return addressForm('Sorry, we do not deliver to ' + v.pincode + ' yet. Try another pincode or contact us.', v); }
+    modal('#authM', false); await loadMe(); checkoutView();
+  } catch (e) { addressForm(e.message, v); }
+}
+let quote = null;
+async function checkoutView(msg, coupon = '') {
+  const items = Object.entries(cart).map(([product_id, quantity]) => ({ product_id: +product_id, quantity }));
+  if (!items.length) return;
+  $('#authT').textContent = 'Checkout';
+  $('#authB').innerHTML = '<div class="msg i">Calculating…</div>'; modal('#authM', true);
+  try {
+    quote = await api('/customer/orders/quote', { method: 'POST', body: { items, coupon: coupon || undefined }, auth: true });
+  } catch (e) { $('#authB').innerHTML = `<div class="msg e">${esc(e.message)}</div><button class="btn block" data-closem>Close</button>`; return; }
+  me = (await loadMe().catch(() => me)) || me;
+  const bal = quote.wallet_balance ?? me.wallet_balance ?? 0, post = me.billing_type === 'postpaid';
+  const short = !post && bal < quote.total ? Math.ceil(quote.total - bal) : 0;
+  const slots = (cfg?.ordering?.slots) || [], first = cfg?.ordering?.first_editable_date || '';
+  const addr = me.default_address?.full || '';
+  $('#authB').innerHTML = `${msg ? `<div class="msg e">${esc(msg)}</div>` : ''}
+    ${quote.lines.map(l => `<div class="row"><span>${esc(l.name)} × ${l.quantity}</span><span>${inr(l.total)}</span></div>`).join('')}
+    <div class="row"><span>Subtotal</span><span>${inr(quote.subtotal)}</span></div>
+    ${quote.discount ? `<div class="row"><span>Discount</span><span>− ${inr(quote.discount)}</span></div>` : ''}
+    <div class="row"><span>Delivery</span><span>${quote.delivery_fee ? inr(quote.delivery_fee) : 'Free'}</span></div>
+    <div class="row t"><span>Total</span><span>${inr(quote.total)}</span></div>
+    <label>Coupon code</label><div style="display:flex;gap:8px"><input id="cp" type="text" value="${esc(coupon)}" placeholder="Optional"><button class="btn ghost sm" id="applyCp">Apply</button></div>
+    <label>Delivering to</label><div class="unit" style="color:var(--ink-soft)">${esc(addr)} · <a href="#" id="chAddr" style="text-decoration:underline">change</a></div>
+    <label>Delivery date</label><input id="dd" type="date" value="${esc(first)}" min="${esc(first)}">
+    ${slots.length > 1 ? `<label>Time slot</label><select id="slot">${slots.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select>` : ''}
+    <label>Note for the delivery person (optional)</label><textarea id="nt" rows="2" maxlength="250"></textarea>
+    <div class="msg i" style="margin-top:14px">Wallet balance: <b>${inr(bal)}</b> ${post ? '(postpaid — billed later)' : ''}</div>
+    ${short ? `<div class="msg e">Add at least ${inr(short)} to your wallet to pay for this order.</div><button class="btn block" id="topup" data-amt="${short}">Add ${inr(Math.max(short, cfg?.wallet?.topup_min || 100))} &amp; pay</button>`
+      : '<button class="btn block" id="place">Place order</button>'}`;
+}
+async function place() {
+  const items = Object.entries(cart).map(([product_id, quantity]) => ({ product_id: +product_id, quantity }));
+  const body = { items, date: $('#dd')?.value || undefined, slot_id: $('#slot') ? +$('#slot').value : undefined, coupon: $('#cp')?.value.trim() || undefined, notes: $('#nt')?.value.trim() || undefined };
+  const b = $('#place'); b.disabled = true; b.textContent = 'Placing…';
+  try {
+    const o = await api('/customer/orders', { method: 'POST', body, auth: true });
+    cart = {}; saveCart();
+    $('#authT').textContent = 'Order placed 🎉';
+    $('#authB').innerHTML = `<div class="msg o">Thank you! Your order <b>${esc(o.number)}</b> is confirmed for ${esc(o.delivery_date)}.</div><p>Total ${inr(o.total)}, paid from your wallet.</p><button class="btn block" data-closem>Continue shopping</button>`;
+  } catch (e) { checkoutView(e.message, $('#cp')?.value.trim()); }
+}
+function loadRzp() { return new Promise((ok, no) => { if (window.Razorpay) return ok(); const s = document.createElement('script'); s.src = 'https://checkout.razorpay.com/v1/checkout.js'; s.onload = ok; s.onerror = () => no(new Error('Could not load the payment window.')); document.head.appendChild(s); }); }
+async function topup() {
+  const b = $('#topup'); const need = +b.dataset.amt, amt = Math.max(need, cfg?.wallet?.topup_min || 100);
+  if (!cfg?.wallet?.online_enabled) return checkoutView('Online payment is not available. Please top up from the Palkkaran app or pay the delivery person, then retry.');
+  b.disabled = true;
+  try {
+    const t = await api('/customer/wallet/topup', { method: 'POST', body: { amount: amt }, auth: true });
+    await loadRzp();
+    new Razorpay({
+      key: t.razorpay_key, order_id: t.razorpay_order_id, amount: t.amount_paise, currency: 'INR', name: t.name || 'Palkkaran', prefill: t.prefill,
+      theme: { color: '#6c5cf5' },
+      handler: async r => {
+        try { await api('/customer/wallet/topup/confirm', { method: 'POST', body: { razorpay_order_id: r.razorpay_order_id, razorpay_payment_id: r.razorpay_payment_id, razorpay_signature: r.razorpay_signature }, auth: true }); toast('Payment received'); checkoutView(); }
+        catch (e) { checkoutView(e.message); }
+      },
+      modal: { ondismiss: () => checkoutView() },
+    }).open();
+  } catch (e) { checkoutView(e.message); }
+}
+async function showOrders() {
+  modal('#ordM', true); $('#ordB').innerHTML = '<div class="msg i">Loading…</div>';
+  try {
+    const r = await api('/customer/orders', { auth: true }); const list = r.data || [];
+    $('#ordB').innerHTML = list.length ? list.map(o => `<div class="line" style="display:block"><div class="row"><b>${esc(o.number)}</b><span>${inr(o.total)}</span></div>
+      <div class="unit">${esc(o.delivery_date)} · ${esc(o.status)}</div><div class="unit">${(o.items || []).map(i => esc(i.product?.name) + ' × ' + i.quantity).join(', ')}</div></div>`).join('') : '<div class="empty">No orders yet.</div>';
+  } catch (e) { $('#ordB').innerHTML = `<div class="msg e">${esc(e.message)}</div>`; }
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', e => {
+  const t = e.target.closest('button,a,[data-cat]'); if (!t) return;
+  if (t.dataset.inc) return inc(t.dataset.inc);
+  if (t.dataset.dec) return dec(t.dataset.dec);
+  if (t.dataset.cat !== undefined && t.classList.contains('chip')) { catId = +t.dataset.cat; renderChips(); return renderGrid(); }
+  if (t.id === 'cartOpen') return openPanel();
+  if (t.hasAttribute('data-close') || t.id === 'ov') return closePanel();
+  if (t.hasAttribute('data-closem')) return document.querySelectorAll('.modal').forEach(m => m.classList.remove('show'));
+  if (t.id === 'checkout') return startCheckout();
+  if (t.id === 'loginLink') { e.preventDefault(); return token ? logout() : authPhone(); }
+  if (t.id === 'ordersLink') { e.preventDefault(); return showOrders(); }
+  if (t.id === 'sendOtp') return sendOtp();
+  if (t.id === 'verify') return verify();
+  if (t.id === 'changeNo') { e.preventDefault(); return authPhone(); }
+  if (t.id === 'saveAddr') return saveAddr();
+  if (t.id === 'applyCp') return checkoutView(null, $('#cp').value.trim());
+  if (t.id === 'chAddr') { e.preventDefault(); return addressForm(null, {}); }
+  if (t.id === 'place') return place();
+  if (t.id === 'topup') return topup();
+});
+$('#ov').addEventListener('click', closePanel);
+$('#q').addEventListener('input', e => { search = e.target.value; renderGrid(); });
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'otp') verify(); if (e.key === 'Enter' && e.target.id === 'ph') sendOtp(); });
+
+updateNav(); loadCatalog();
+if (token) loadMe().catch(() => {});
+})();
+</script>
+</body>
+</html>
