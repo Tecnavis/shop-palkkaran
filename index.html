@@ -101,7 +101,9 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
 
 <script>
 (() => {
-const API = 'https://api.palkkaran.in/api/v1';
+const HOSTS = ['https://api.palkkaran.in/api/v1', 'https://admin.palkkaran.in/api/v1', 'https://palkkaran.in/api/v1'];
+let API = store_get('pk_api') || HOSTS[0];
+function store_get(k){ try { return localStorage.getItem(k) } catch { return null } }
 const $ = s => document.querySelector(s);
 const inr = n => '₹' + (Math.round(n * 100) / 100).toLocaleString('en-IN');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -118,8 +120,14 @@ async function api(path, { method = 'GET', body, auth = false } = {}) {
   if (body) h['Content-Type'] = 'application/json';
   if (auth && token) h.Authorization = 'Bearer ' + token;
   let r;
-  try { r = await fetch(API + path, { method, headers: h, body: body ? JSON.stringify(body) : undefined }); }
-  catch { throw new Error('Cannot reach the server. Check your internet and try again.'); }
+  const order = [API, ...HOSTS.filter(x => x !== API)];
+  for (const base of order) {
+    try { r = await fetch(base + path, { method, headers: h, body: body ? JSON.stringify(body) : undefined });
+      if (base !== API) { API = base; try { localStorage.setItem('pk_api', base) } catch {} }
+      break; }
+    catch { r = null; }
+  }
+  if (!r) throw new Error('Cannot reach the server (network or CORS). Please try again in a moment.');
   let j = null; try { j = await r.json(); } catch {}
   if (r.status === 401 && auth) { logout(true); throw new Error('Please log in again.'); }
   if (!r.ok) {
