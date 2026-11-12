@@ -65,7 +65,8 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
   <a class="logo" href="https://www.palkkaran.in"><i><svg viewBox="0 0 24 24"><path d="M12 2.5S5 10.2 5 14.6A7 7 0 0 0 19 14.6C19 10.2 12 2.5 12 2.5Z"/></svg></i>Palkkaran</a>
   <nav class="nav">
     <a class="l" href="https://www.palkkaran.in">Home</a>
-    <a class="l" href="#" id="ordersLink" style="display:none">My orders</a>
+    <a class="l" href="account.html#orders" id="ordersLink" style="display:none">My orders</a>
+    <a class="l" href="account.html#subs" id="subsLink" style="display:none">Subscriptions</a>
     <a class="l" href="#" id="loginLink">Login</a>
     <button class="btn cartbtn" id="cartOpen">🛒 Cart <span class="badge" id="cartN">0</span></button>
   </nav>
@@ -189,7 +190,7 @@ function modal(id, show) { $(id).classList.toggle('show', show); if (show) { clo
 function logout(silent) { token = null; me = null; store.del('pk_token'); updateNav(); if (!silent) toast('Logged out'); }
 function updateNav() {
   $('#loginLink').textContent = token ? 'Logout' : 'Login';
-  $('#ordersLink').style.display = token ? '' : 'none';
+  $('#ordersLink').style.display = token ? '' : 'none'; $('#subsLink').style.display = token ? '' : 'none';
 }
 function authPhone(msg) {
   $('#authT').textContent = 'Login with mobile';
@@ -293,7 +294,7 @@ async function place() {
     const o = await api('/customer/orders', { method: 'POST', body, auth: true });
     cart = {}; saveCart();
     $('#authT').textContent = 'Order placed 🎉';
-    $('#authB').innerHTML = `<div class="msg o">Thank you! Your order <b>${esc(o.number)}</b> is confirmed for ${esc(o.delivery_date)}.</div><p>Total ${inr(o.total)}, paid from your wallet.</p><button class="btn block" data-closem>Continue shopping</button>`;
+    $('#authB').innerHTML = `<div class="msg o">Thank you! Your order <b>${esc(o.number)}</b> is confirmed for ${esc(o.delivery_date)}.</div><p>Total ${inr(o.total)}, paid from your wallet.</p><a class="btn block" href="account.html#orders">Track my order</a><p style="text-align:center"><a href="#" data-closem style="text-decoration:underline">Continue shopping</a></p>`;
   } catch (e) { checkoutView(e.message, $('#cp')?.value.trim()); }
 }
 function loadRzp() { return new Promise((ok, no) => { if (window.Razorpay) return ok(); const s = document.createElement('script'); s.src = 'https://checkout.razorpay.com/v1/checkout.js'; s.onload = ok; s.onerror = () => no(new Error('Could not load the payment window.')); document.head.appendChild(s); }); }
@@ -335,7 +336,6 @@ document.addEventListener('click', e => {
   if (t.hasAttribute('data-closem')) return document.querySelectorAll('.modal').forEach(m => m.classList.remove('show'));
   if (t.id === 'checkout') return startCheckout();
   if (t.id === 'loginLink') { e.preventDefault(); return token ? logout() : authPhone(); }
-  if (t.id === 'ordersLink') { e.preventDefault(); return showOrders(); }
   if (t.id === 'sendOtp') return sendOtp();
   if (t.id === 'verify') return verify();
   if (t.id === 'changeNo') { e.preventDefault(); return authPhone(); }

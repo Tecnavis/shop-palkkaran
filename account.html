@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My account | Palkkaran Shop</title>
+<meta name="theme-color" content="#6c5cf5">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%236c5cf5'/%3E%3Cpath d='M16 6s-7 8-7 12.5a7 7 0 0 0 14 0C23 14 16 6 16 6z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--violet:#6c5cf5;--violet-600:#5a48e8;--violet-700:#4430c9;--ink:#1e1652;--ink-soft:#4d4675;--muted:#7b75a0;--milk:#fffdf8;--lav:#efecff;--lav-2:#e2ddff;--line:rgba(30,22,82,.1);--ok:#16a34a;--bad:#dc2626;--warn:#d97706;--r:18px}
+*{box-sizing:border-box}body{margin:0;font-family:"Plus Jakarta Sans",system-ui,sans-serif;color:var(--ink-soft);background:var(--milk);line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:Fredoka,system-ui,sans-serif;color:var(--ink);margin:0 0 .4em;line-height:1.15}
+a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}
+.wrap{width:min(100% - 32px,900px);margin-inline:auto}
+header{position:sticky;top:0;z-index:20;background:rgba(255,253,248,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:14px;height:66px}
+.logo{display:flex;align-items:center;gap:8px;font:600 22px Fredoka,sans-serif;color:var(--ink)}
+.logo i{width:32px;height:32px;border-radius:10px;background:var(--violet);display:grid;place-items:center}.logo svg{width:18px;fill:#fff}
+.nav{margin-left:auto;display:flex;align-items:center;gap:6px}.nav a.l{padding:8px 12px;font-weight:600;font-size:15px;border-radius:999px}.nav a.l:hover{background:var(--lav)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:11px 20px;font-weight:700;background:var(--violet);color:#fff;cursor:pointer}
+.btn:hover{background:var(--violet-600)}.btn.ghost{background:var(--lav);color:var(--violet-700)}.btn.danger{background:#fee2e2;color:#991b1b}.btn.sm{padding:7px 14px;font-size:14px}.btn.block{width:100%}.btn[disabled]{opacity:.5}
+.tabs{display:flex;gap:8px;margin:22px 0 16px;overflow-x:auto}
+.tab{padding:10px 18px;border-radius:999px;background:#fff;border:1.5px solid var(--lav-2);font-weight:700;cursor:pointer;white-space:nowrap;color:var(--ink-soft)}.tab.on{background:var(--violet);border-color:var(--violet);color:#fff}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px;box-shadow:0 8px 24px -18px rgba(30,22,82,.35)}
+.top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.top b{color:var(--ink);font-size:17px}
+.unit{font-size:13px;color:var(--muted)}.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.pill{display:inline-block;padding:3px 12px;border-radius:999px;font-size:12px;font-weight:800;text-transform:capitalize;background:var(--lav);color:var(--violet-700)}
+.pill.ok{background:#dcfce7;color:#166534}.pill.bad{background:#fee2e2;color:#991b1b}.pill.warn{background:#fef3c7;color:#92400e}
+.steps{display:flex;align-items:center;margin:14px 0 2px}.st{flex:1;text-align:center;font-size:12px;color:var(--muted);position:relative}
+.st i{display:block;width:18px;height:18px;border-radius:50%;background:var(--lav-2);margin:0 auto 4px;position:relative;z-index:1}
+.st.on i{background:var(--ok)}.st.on{color:var(--ink);font-weight:700}.st:not(:last-child)::after{content:"";position:absolute;top:8px;left:50%;width:100%;height:3px;background:var(--lav-2)}.st.on:not(:last-child)::after{background:var(--ok)}
+.row{display:flex;justify-content:space-between;padding:4px 0}.balance{font:700 34px Fredoka,sans-serif;color:var(--ink)}
+.empty{padding:50px 0;text-align:center;color:var(--muted)}
+.modal{position:fixed;inset:0;background:rgba(30,22,82,.45);display:none;place-items:center;z-index:60;padding:16px}.modal.show{display:grid}.box{background:#fff;border-radius:22px;padding:24px;width:min(440px,100%);max-height:92vh;overflow:auto}
+label{display:block;font-weight:600;font-size:14px;color:var(--ink);margin:12px 0 4px}
+input,select{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--lav-2);background:#fff}
+.msg{padding:10px 14px;border-radius:12px;margin:10px 0;font-size:14px}.msg.e{background:#fee2e2;color:#991b1b}.msg.i{background:var(--lav);color:var(--violet-700)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:999px;z-index:80;transition:.3s;font-weight:600}.toast.show{transform:translateX(-50%)}
+.x{background:none;border:0;font-size:26px;cursor:pointer;color:var(--ink)}
+.plans{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+</style>
+</head>
+<body>
+<header><div class="wrap bar">
+  <a class="logo" href="index.html"><i><svg viewBox="0 0 24 24"><path d="M12 2.5S5 10.2 5 14.6A7 7 0 0 0 19 14.6C19 10.2 12 2.5 12 2.5Z"/></svg></i>Palkkaran</a>
+  <nav class="nav"><a class="l" href="index.html">Shop</a><a class="l" href="#" id="logout">Logout</a></nav>
+</div></header>
+<main class="wrap">
+  <h1 style="margin-top:26px" id="hello">My account</h1>
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-t="orders">Orders</button>
+    <button class="tab" data-t="subs">Subscriptions</button>
+    <button class="tab" data-t="plans">Start a plan</button>
+    <button class="tab" data-t="wallet">Wallet</button>
+  </div>
+  <div id="view"><div class="empty">Loading…</div></div>
+</main>
+<div class="modal" id="m"><div class="box"><div style="display:flex;justify-content:space-between"><h2 id="mt"></h2><button class="x" id="mx">&times;</button></div><div id="mb"></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+const HOSTS = ['https://admin.palkkaran.in/api/v1', 'https://api.palkkaran.in/api/v1', 'https://palkkaran.in/api/v1'];
+const lsGet = k => { try { return localStorage.getItem(k) } catch { return null } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, v) } catch {} };
+let API = lsGet('pk_api') || HOSTS[0];
+let token = null; try { token = JSON.parse(lsGet('pk_token')) } catch {}
+const $ = s => document.querySelector(s);
+const inr = n => '₹' + (Math.round(n * 100) / 100).toLocaleString('en-IN');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = d => d ? new Date(d + (String(d).length === 10 ? 'T00:00:00' : '')).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+const iso = d => d.toISOString().slice(0, 10);
+function toast(t) { const e = $('#toast'); e.textContent = t; e.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('show'), 2800); }
+
+async function api(path, { method = 'GET', body } = {}) {
+  const h = { Accept: 'application/json', Authorization: 'Bearer ' + token };
+  if (body) h['Content-Type'] = 'application/json';
+  let r = null;
+  for (const base of [API, ...HOSTS.filter(x => x !== API)]) {
+    try { r = await fetch(base + path, { method, headers: h, body: body ? JSON.stringify(body) : undefined }); if (base !== API) { API = base; lsSet('pk_api', base); } break; } catch { r = null; }
+  }
+  if (!r) throw new Error('Cannot reach the server. Please try again.');
+  let j = null; try { j = await r.json(); } catch {}
+  if (r.status === 401) { try { localStorage.removeItem('pk_token') } catch {} location.href = 'index.html'; throw new Error('Please log in again.'); }
+  if (!r.ok) throw new Error((j && j.errors ? Object.values(j.errors)[0][0] : j && j.message) || 'Something went wrong (' + r.status + ')');
+  return j;
+}
+if (!token) { location.href = 'index.html'; return; }
+
+let tab = (location.hash || '#orders').slice(1), cfg = null;
+const view = $('#view');
+function modal(title, html) { $('#mt').textContent = title; $('#mb').innerHTML = html; $('#m').classList.add('show'); }
+const close = () => $('#m').classList.remove('show');
+function setTab(t) { tab = t; history.replaceState(null, '', '#' + t); document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b.dataset.t === t)); load(); }
+
+async function load() {
+  view.innerHTML = '<div class="empty">Loading…</div>';
+  try { await ({ orders, subs, plans, wallet }[tab] || orders)(); } catch (e) { view.innerHTML = `<div class="msg e">${esc(e.message)}</div>`; }
+}
+
+/* ---------- orders ---------- */
+const FLOW = ['placed', 'confirmed', 'out_for_delivery', 'delivered'];
+function steps(o) {
+  if (o.status === 'cancelled') return '<div class="msg e" style="margin-top:12px">This order was cancelled.</div>';
+  const at = o.status === 'delivered' ? 3 : o.status === 'out_for_delivery' ? 2 : 1;
+  const L = ['Placed', 'Confirmed', 'Out for delivery', 'Delivered'];
+  return `<div class="steps">${L.map((l, i) => `<div class="st ${i <= at ? 'on' : ''}"><i></i>${l}</div>`).join('')}</div>`;
+}
+async function orders() {
+  const r = await api('/customer/orders'); const list = r.data || [];
+  if (!list.length) { view.innerHTML = '<div class="empty">No orders yet.<br><br><a class="btn" href="index.html">Start shopping</a></div>'; return; }
+  view.innerHTML = list.map(o => {
+    const cls = o.status === 'delivered' ? 'ok' : o.status === 'cancelled' ? 'bad' : 'warn';
+    return `<div class="card"><div class="top"><div><b>${esc(o.number)}</b><div class="unit">Delivery on ${fmt(o.delivery_date)}</div></div>
+      <div style="text-align:right"><b>${inr(o.total)}</b><br><span class="pill ${cls}">${esc(String(o.status).replace(/_/g, ' '))}</span></div></div>
+      ${steps(o)}
+      <div style="margin-top:10px">${(o.items || []).map(i => `<div class="row"><span>${esc(i.product?.name)} × ${i.quantity}</span><span>${inr(i.total ?? i.price * i.quantity)}</span></div>`).join('')}</div>
+      <div class="acts">${o.status === 'confirmed' ? `<button class="btn danger sm" data-cancel="${o.id}">Cancel order</button>` : ''}
+      <button class="btn ghost sm" data-reorder='${esc(JSON.stringify((o.items || []).map(i => [i.product_id, i.quantity])))}'>Order again</button></div></div>`;
+  }).join('');
+}
+
+/* ---------- subscriptions ---------- */
+async function subs() {
+  const [s, p] = await Promise.all([api('/customer/subscriptions'), api('/customer/pauses')]);
+  const list = s.data || [], pauses = p.data || p || [];
+  const g = pauses.filter(x => !x.subscription_id);
+  let html = '';
+  if (g.length) html += g.map(x => `<div class="msg i">Deliveries paused ${fmt(x.from_date)}${x.to_date ? ' to ' + fmt(x.to_date) : ' until you resume'} <button class="btn sm ghost" data-resume="${x.id}" style="margin-left:8px">Resume</button></div>`).join('');
+  html += `<div class="acts" style="margin:0 0 14px"><button class="btn ghost sm" data-pause="all">⏸ Pause all deliveries (holiday)</button></div>`;
+  if (!list.length) html += '<div class="empty">No active subscriptions.<br><br><button class="btn" data-go="plans">Start a plan</button></div>';
+  html += list.map(x => {
+    const cls = x.status === 'active' ? 'ok' : 'warn';
+    return `<div class="card"><div class="top"><div><b>${esc(x.product?.name)}</b><div class="unit">${esc(x.description)}</div><div class="unit">From ${fmt(x.start_date)}${x.end_date ? ' · until ' + fmt(x.end_date) : ''}${x.slot ? ' · ' + esc(x.slot.name) : ''}</div></div>
+      <div style="text-align:right"><b>${x.quantity} × ${inr(x.unit_price)}</b><br><span class="pill ${cls}">${esc(x.status)}${x.is_trial ? ' · plan' : ''}</span></div></div>
+      ${x.pause ? `<div class="msg i" style="margin-top:10px">Paused ${fmt(x.pause.from_date)}${x.pause.to_date ? ' – ' + fmt(x.pause.to_date) : ''} <button class="btn sm ghost" data-resume="${x.pause.id}" style="margin-left:8px">Resume</button></div>` : ''}
+      <div class="acts"><button class="btn ghost sm" data-qty="${x.id}">Change a day</button><button class="btn ghost sm" data-pause="${x.id}">Pause</button><button class="btn danger sm" data-stop="${x.id}">Stop</button></div></div>`;
+  }).join('');
+  view.innerHTML = html;
+}
+function tomorrow() { const d = new Date(); d.setDate(d.getDate() + 1); return iso(d); }
+const firstDay = () => cfg?.ordering?.first_editable_date || tomorrow();
+
+/* ---------- plans ---------- */
+async function plans() {
+  cfg = cfg || await fetch(API + '/config').then(r => r.json()).catch(() => null);
+  const r = await api('/customer/trial-plans'); const list = r.data || r || [];
+  if (!list.length) { view.innerHTML = '<div class="empty">No plans available right now.</div>'; return; }
+  view.innerHTML = `<div class="plans">${list.map(t => `<div class="card" style="margin:0"><b>${esc(t.name)}</b><div class="unit">${esc(t.product?.name || '')}</div>
+    <p style="margin:8px 0">${esc(t.description || (t.days + ' days' + (t.free_days ? ' + ' + t.free_days + ' free' : '')))}</p>
+    <div class="row"><span>${t.total_days} days · ${t.quantity}/day</span><b>${inr(t.total)}</b></div>
+    <button class="btn block sm" data-plan="${t.id}" style="margin-top:10px">Start this plan</button></div>`).join('')}</div>`;
+}
+
+/* ---------- wallet ---------- */
+async function wallet() {
+  const w = await api('/customer/wallet'); const tx = (w.transactions?.data) || [];
+  view.innerHTML = `<div class="card"><div class="unit">Wallet balance</div><div class="balance">${inr(w.balance)}</div>
+    ${w.billing_type === 'postpaid' ? '<div class="unit">Postpaid — billed monthly</div>' : '<div class="unit">Add money from the Palkkaran app or at checkout in the shop.</div>'}</div>
+    <h3>Recent activity</h3>${tx.length ? tx.map(t => `<div class="card" style="padding:12px 16px"><div class="top"><div><b style="font-size:15px">${esc(t.description || t.category)}</b><div class="unit">${fmt(t.created_at)}</div></div><b style="color:${t.type === 'credit' ? 'var(--ok)' : 'var(--ink)'}">${t.type === 'credit' ? '+' : '−'}${inr(Math.abs(t.amount))}</b></div></div>`).join('') : '<div class="empty">No transactions yet.</div>'}`;
+}
+
+/* ---------- actions ---------- */
+document.addEventListener('click', async e => {
+  const b = e.target.closest('button,a'); if (!b) return;
+  try {
+    if (b.id === 'mx') return close();
+    if (b.id === 'logout') { e.preventDefault(); try { localStorage.removeItem('pk_token') } catch {} location.href = 'index.html'; return; }
+    if (b.classList.contains('tab')) return setTab(b.dataset.t);
+    if (b.dataset.go) return setTab(b.dataset.go);
+    if (b.dataset.cancel) { if (!confirm('Cancel this order?')) return; await api(`/customer/orders/${b.dataset.cancel}/cancel`, { method: 'POST' }); toast('Order cancelled'); return load(); }
+    if (b.dataset.reorder) { const cart = {}; JSON.parse(b.dataset.reorder).forEach(([id, q]) => cart[id] = q); lsSet('pk_cart', JSON.stringify(cart)); location.href = 'index.html'; return; }
+    if (b.dataset.resume) { await api(`/customer/pauses/${b.dataset.resume}/resume`, { method: 'POST' }); toast('Deliveries resumed'); return load(); }
+    if (b.dataset.stop) { if (!confirm('Stop this subscription? Deliveries end from the next available day.')) return; await api(`/customer/subscriptions/${b.dataset.stop}/cancel`, { method: 'POST', body: {} }); toast('Subscription stopped'); return load(); }
+    if (b.dataset.pause) return modal('Pause deliveries', `<label>From</label><input id="pf" type="date" value="${firstDay()}" min="${firstDay()}"><label>To (leave empty to pause until you resume)</label><input id="pt" type="date" min="${firstDay()}"><div style="margin-top:16px"><button class="btn block" id="doPause" data-id="${b.dataset.pause}">Pause</button></div>`);
+    if (b.id === 'doPause') { const body = { from_date: $('#pf').value, to_date: $('#pt').value || undefined }; if (b.dataset.id !== 'all') body.subscription_id = +b.dataset.id; await api('/customer/pauses', { method: 'POST', body }); close(); toast('Paused'); return load(); }
+    if (b.dataset.qty) return modal('Change one day', `<div class="msg i">Set a different quantity for one day. Use 0 to skip that day.</div><label>Date</label><input id="qd" type="date" value="${firstDay()}" min="${firstDay()}"><label>Quantity (0 = skip)</label><input id="qq" type="number" min="0" max="50" value="0"><div style="margin-top:16px"><button class="btn block" id="doQty" data-id="${b.dataset.qty}">Save</button></div>`);
+    if (b.id === 'doQty') { await api(`/customer/subscriptions/${b.dataset.id}/quantity`, { method: 'POST', body: { date: $('#qd').value, quantity: +$('#qq').value } }); close(); toast('Updated'); return load(); }
+    if (b.dataset.plan) {
+      const r = await api('/customer/trial-plans'); const p = (r.data || r).find(x => x.id == b.dataset.plan);
+      return modal('Start ' + p.name, `<div class="msg i">${p.total_days} days · ${p.quantity}/day · ${inr(p.total)} (charged from your wallet day by day)</div><label>Start date</label><input id="sd" type="date" value="${firstDay()}" min="${firstDay()}"><div style="margin-top:16px"><button class="btn block" id="doPlan" data-id="${p.id}" data-prod="${p.product?.id}" data-q="${p.quantity}">Start plan</button></div>`);
+    }
+    if (b.id === 'doPlan') { await api('/customer/subscriptions', { method: 'POST', body: { trial_plan_id: +b.dataset.id, product_id: +b.dataset.prod, pattern: 'daily', quantity: +b.dataset.q, start_date: $('#sd').value } }); close(); toast('Plan started 🎉'); return setTab('subs'); }
+  } catch (err) { toast(err.message); }
+});
+$('#m').addEventListener('click', e => { if (e.target.id === 'm') close(); });
+addEventListener('hashchange', () => { tab = (location.hash || '#orders').slice(1); setTab(tab); });
+
+(async () => {
+  try { const me = await api('/customer/me'); const n = (me.data || me).name; if (n) $('#hello').textContent = 'Hi ' + n.split(' ')[0] + ' 👋'; } catch {}
+  cfg = await fetch(API + '/config').then(r => r.json()).catch(() => null);
+  setTab(['orders', 'subs', 'plans', 'wallet'].includes(tab) ? tab : 'orders');
+})();
+})();
+</script>
+</body>
+</html>
