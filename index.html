@@ -236,7 +236,7 @@ function updateNav() {
 function authPhone(msg) {
   $('#authT').textContent = 'Login with mobile';
   $('#authB').innerHTML = `${msg ? `<div class="msg e">${esc(msg)}</div>` : ''}<label>Mobile number</label><input id="ph" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number">
-    <p class="unit">We will send a one-time password (OTP) by SMS/WhatsApp.</p><button class="btn block" id="sendOtp">Send OTP</button>`;
+    <p class="unit">We will send a one-time password (OTP) by SMS.</p><button class="btn block" id="sendOtp">Send OTP</button>`;
   modal('#authM', true);
 }
 async function sendOtp() {
