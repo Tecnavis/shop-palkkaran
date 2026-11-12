@@ -82,6 +82,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
 
 <main class="wrap">
   <section class="hero"><h1>Palkkaran Shop</h1><p>Farm-fresh milk, ghee and dairy. Add to cart, log in with your mobile number and we deliver to your doorstep.</p></section>
+  <div class="tools" style="margin-bottom:0"><div id="area" style="flex:1;min-width:260px"></div></div>
   <div class="tools"><input class="search" id="q" type="search" placeholder="Search products…"></div>
   <div class="chips" id="chips"></div>
   <div class="grid" id="grid"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
@@ -159,6 +160,25 @@ async function api(path, { method = 'GET', body, auth = false } = {}) {
   return j;
 }
 
+/* ---------- delivery area ---------- */
+const CONTACT = { tel: '+917994753798', label: '+91 799 475 3798' };
+let area = store.get('pk_area', null);   // {pin, ok, places}
+function noService(pin) {
+  return `<div class="msg e"><b>Service is not available right now at ${esc(pin)}.</b><br>We are expanding soon. Contact us and we will tell you when we reach your area.
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><a class="btn sm" href="tel:${CONTACT.tel}">Call ${CONTACT.label}</a><a class="btn ghost sm" href="https://wa.me/917994753798" rel="noopener">WhatsApp</a><a class="btn ghost sm" href="https://www.palkkaran.in/contact.html">Contact form</a></div></div>`;
+}
+function renderArea(busy) {
+  const el = $('#area'); if (!el) return;
+  const st = area ? (area.ok ? `<div class="msg o" style="margin:8px 0 0">✓ We deliver to <b>${esc(area.pin)}</b>${area.places?.length ? ' (' + esc(area.places.join(', ')) + ')' : ''}. <a href="#" id="chPin" style="text-decoration:underline">Change</a></div>` : noService(area.pin) + '<a href="#" id="chPin" style="text-decoration:underline;font-size:14px">Try another pincode</a>') : '';
+  el.innerHTML = (area && area.ok) || (area && !area.ok) ? st : `<div class="msg i" style="margin:0"><b>Check delivery to your area</b>
+    <div style="display:flex;gap:8px;margin-top:8px"><input id="pinIn" type="tel" inputmode="numeric" maxlength="6" placeholder="Your 6-digit pincode" style="flex:1"><button class="btn sm" id="pinGo" ${busy ? 'disabled' : ''}>Check</button></div></div>`;
+}
+async function checkPin(pin) {
+  const r = await api('/serviceability?pincode=' + pin);
+  area = { pin, ok: !!r.serviceable, places: r.places || [] }; store.set('pk_area', area); renderArea();
+  return area;
+}
+
 /* ---------- catalogue ---------- */
 async function loadCatalog() {
   try {
@@ -166,7 +186,7 @@ async function loadCatalog() {
     cats = c.data || c; products = p.data || p; cfg = conf;
     // drop cart items that no longer exist
     Object.keys(cart).forEach(id => { if (!products.find(x => x.id == id)) delete cart[id]; });
-    renderChips(); renderGrid(); renderCartN();
+    renderChips(); renderGrid(); renderCartN(); renderArea();
   } catch (e) { $('#grid').innerHTML = '<div class="empty" style="grid-column:1/-1">' + esc(e.message) + '<br><br><button class="btn" onclick="location.reload()">Retry</button></div>'; }
 }
 function renderChips() {
@@ -250,6 +270,7 @@ async function verify() {
 /* ---------- checkout ---------- */
 async function loadMe() { const r = await api('/customer/me', { auth: true }); me = r.data || r; return me; }
 async function startCheckout() {
+  if (area && !area.ok) { closePanel(); $('#area').scrollIntoView({ behavior: 'smooth' }); return toast('Delivery is not available at ' + area.pin); }
   if (!token) return authPhone();
   try { await loadMe(); } catch (e) { return toast(e.message); }
   if (!me.default_address) return addressForm();
@@ -270,8 +291,11 @@ function addressForm(msg, v = {}) {
 async function saveAddr() {
   const v = { name: $('#a_name')?.value.trim(), house: $('#a_house').value.trim(), street: $('#a_street').value.trim(), landmark: $('#a_land').value.trim(), city: $('#a_city').value.trim(), pincode: $('#a_pin').value.trim() };
   if (!v.house || !/^\d{6}$/.test(v.pincode)) return addressForm('House and a 6-digit pincode are required.', v);
-  const b = $('#saveAddr'); b.disabled = true; b.textContent = 'Saving…';
+  const b = $('#saveAddr'); b.disabled = true; b.textContent = 'Checking area…';
   try {
+    const chk = await checkPin(v.pincode);
+    if (!chk.ok) { $('#authB').innerHTML = noService(v.pincode) + '<button class="btn ghost block" style="margin-top:12px" data-closem>Close</button>'; return; }
+    b.textContent = 'Saving…';
     if (v.name) await api('/customer/me', { method: 'POST', body: { name: v.name }, auth: true });
     const r = await api('/customer/addresses', { method: 'POST', body: { house: v.house, street: v.street, landmark: v.landmark, city: v.city, pincode: v.pincode, locality: v.street, is_default: true }, auth: true });
     if (r.serviceable === false) { return addressForm('Sorry, we do not deliver to ' + v.pincode + ' yet. Try another pincode or contact us.', v); }
@@ -361,6 +385,8 @@ document.addEventListener('click', e => {
   if (t.id === 'verify') return verify();
   if (t.id === 'changeNo') { e.preventDefault(); return authPhone(); }
   if (t.id === 'saveAddr') return saveAddr();
+  if (t.id === 'chPin') { e.preventDefault(); area = null; store.del('pk_area'); renderArea(); return; }
+  if (t.id === 'pinGo') { const p = $('#pinIn').value.replace(/\D/g, ''); if (p.length !== 6) return toast('Enter a 6-digit pincode'); t.disabled = true; return checkPin(p).catch(err => { t.disabled = false; toast(err.message); }); }
   if (t.id === 'applyCp') return checkoutView(null, $('#cp').value.trim());
   if (t.id === 'chAddr') { e.preventDefault(); return addressForm(null, {}); }
   if (t.id === 'place') return ask('Place this order?', 'It will be paid from your wallet and cannot be changed after the cutoff time.', { ok: 'Yes, place order' }).then(y => y && place());
