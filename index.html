@@ -58,6 +58,14 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--violet);border-c
 footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:14px}
 .modal{position:fixed;inset:0;display:none;place-items:center;z-index:60;padding:16px}.modal.show{display:grid}.modal .box{background:#fff;border-radius:22px;padding:24px;width:min(460px,100%);max-height:92vh;overflow:auto}
 @media(max-width:640px){.nav a.l{display:none}.grid{grid-template-columns:repeat(2,1fr);gap:12px}.card h3{font-size:15px}}
+
+.swal{position:fixed;inset:0;background:rgba(30,22,82,.5);display:none;place-items:center;z-index:100;padding:16px}.swal.show{display:grid}
+.swal .sb{background:#fff;border-radius:24px;padding:28px 24px 22px;width:min(380px,100%);text-align:center;animation:pop .18s ease-out}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
+.swal .ic{width:64px;height:64px;border-radius:50%;margin:0 auto 12px;display:grid;place-items:center;font-size:30px;background:#fef3c7;color:#b45309}
+.swal.danger .ic{background:#fee2e2;color:#b91c1c}.swal h3{font-size:22px}.swal p{margin:0 0 18px;color:var(--muted)}
+.swal .bt{display:flex;gap:10px}.swal .bt button{flex:1;border:0;border-radius:999px;padding:12px;font-weight:700;cursor:pointer;background:var(--lav);color:var(--violet-700)}
+.swal .bt button.go{background:var(--violet);color:#fff}.swal.danger .bt button.go{background:#dc2626}
 </style>
 </head>
 <body>
@@ -98,6 +106,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
   <div id="ordB"></div>
 </div></div>
 
+<div class="swal" id="swal"><div class="sb"><div class="ic" id="swIc">!</div><h3 id="swT"></h3><p id="swP"></p><div class="bt"><button id="swNo">Cancel</button><button class="go" id="swYes">Yes</button></div></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -105,6 +114,18 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
 const HOSTS = ['https://api.palkkaran.in/api/v1', 'https://admin.palkkaran.in/api/v1', 'https://palkkaran.in/api/v1'];
 let API = store_get('pk_api') || HOSTS[0];
 function store_get(k){ try { return localStorage.getItem(k) } catch { return null } }
+
+function ask(title, text, { ok = 'Yes, continue', danger = false } = {}) {
+  return new Promise(res => {
+    const m = document.getElementById('swal');
+    document.getElementById('swT').textContent = title; document.getElementById('swP').textContent = text || '';
+    document.getElementById('swIc').textContent = danger ? '🗑' : '?'; document.getElementById('swYes').textContent = ok;
+    m.classList.toggle('danger', danger); m.classList.add('show');
+    const done = v => { m.classList.remove('show'); yes.onclick = no.onclick = m.onclick = null; res(v); };
+    const yes = document.getElementById('swYes'), no = document.getElementById('swNo');
+    yes.onclick = () => done(true); no.onclick = () => done(false); m.onclick = e => { if (e.target === m) done(false); };
+  });
+}
 const $ = s => document.querySelector(s);
 const inr = n => '₹' + (Math.round(n * 100) / 100).toLocaleString('en-IN');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -335,14 +356,14 @@ document.addEventListener('click', e => {
   if (t.hasAttribute('data-close') || t.id === 'ov') return closePanel();
   if (t.hasAttribute('data-closem')) return document.querySelectorAll('.modal').forEach(m => m.classList.remove('show'));
   if (t.id === 'checkout') return startCheckout();
-  if (t.id === 'loginLink') { e.preventDefault(); return token ? logout() : authPhone(); }
+  if (t.id === 'loginLink') { e.preventDefault(); if (!token) return authPhone(); return ask('Log out?', 'Your cart stays saved on this device.', { ok: 'Yes, log out', danger: true }).then(y => y && logout()); }
   if (t.id === 'sendOtp') return sendOtp();
   if (t.id === 'verify') return verify();
   if (t.id === 'changeNo') { e.preventDefault(); return authPhone(); }
   if (t.id === 'saveAddr') return saveAddr();
   if (t.id === 'applyCp') return checkoutView(null, $('#cp').value.trim());
   if (t.id === 'chAddr') { e.preventDefault(); return addressForm(null, {}); }
-  if (t.id === 'place') return place();
+  if (t.id === 'place') return ask('Place this order?', 'It will be paid from your wallet and cannot be changed after the cutoff time.', { ok: 'Yes, place order' }).then(y => y && place());
   if (t.id === 'topup') return topup();
 });
 $('#ov').addEventListener('click', closePanel);

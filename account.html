@@ -40,6 +40,14 @@ input,select{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid 
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:999px;z-index:80;transition:.3s;font-weight:600}.toast.show{transform:translateX(-50%)}
 .x{background:none;border:0;font-size:26px;cursor:pointer;color:var(--ink)}
 .plans{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+
+.swal{position:fixed;inset:0;background:rgba(30,22,82,.5);display:none;place-items:center;z-index:100;padding:16px}.swal.show{display:grid}
+.swal .sb{background:#fff;border-radius:24px;padding:28px 24px 22px;width:min(380px,100%);text-align:center;animation:pop .18s ease-out}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
+.swal .ic{width:64px;height:64px;border-radius:50%;margin:0 auto 12px;display:grid;place-items:center;font-size:30px;background:#fef3c7;color:#b45309}
+.swal.danger .ic{background:#fee2e2;color:#b91c1c}.swal h3{font-size:22px}.swal p{margin:0 0 18px;color:var(--muted)}
+.swal .bt{display:flex;gap:10px}.swal .bt button{flex:1;border:0;border-radius:999px;padding:12px;font-weight:700;cursor:pointer;background:var(--lav);color:var(--violet-700)}
+.swal .bt button.go{background:var(--violet);color:#fff}.swal.danger .bt button.go{background:#dc2626}
 </style>
 </head>
 <body>
@@ -58,6 +66,7 @@ input,select{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid 
   <div id="view"><div class="empty">Loading…</div></div>
 </main>
 <div class="modal" id="m"><div class="box"><div style="display:flex;justify-content:space-between"><h2 id="mt"></h2><button class="x" id="mx">&times;</button></div><div id="mb"></div></div></div>
+<div class="swal" id="swal"><div class="sb"><div class="ic" id="swIc">!</div><h3 id="swT"></h3><p id="swP"></p><div class="bt"><button id="swNo">Cancel</button><button class="go" id="swYes">Yes</button></div></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -67,6 +76,18 @@ const lsGet = k => { try { return localStorage.getItem(k) } catch { return null 
 const lsSet = (k, v) => { try { localStorage.setItem(k, v) } catch {} };
 let API = lsGet('pk_api') || HOSTS[0];
 let token = null; try { token = JSON.parse(lsGet('pk_token')) } catch {}
+
+function ask(title, text, { ok = 'Yes, continue', danger = false } = {}) {
+  return new Promise(res => {
+    const m = document.getElementById('swal');
+    document.getElementById('swT').textContent = title; document.getElementById('swP').textContent = text || '';
+    document.getElementById('swIc').textContent = danger ? '🗑' : '?'; document.getElementById('swYes').textContent = ok;
+    m.classList.toggle('danger', danger); m.classList.add('show');
+    const done = v => { m.classList.remove('show'); yes.onclick = no.onclick = m.onclick = null; res(v); };
+    const yes = document.getElementById('swYes'), no = document.getElementById('swNo');
+    yes.onclick = () => done(true); no.onclick = () => done(false); m.onclick = e => { if (e.target === m) done(false); };
+  });
+}
 const $ = s => document.querySelector(s);
 const inr = n => '₹' + (Math.round(n * 100) / 100).toLocaleString('en-IN');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -167,22 +188,22 @@ document.addEventListener('click', async e => {
   const b = e.target.closest('button,a'); if (!b) return;
   try {
     if (b.id === 'mx') return close();
-    if (b.id === 'logout') { e.preventDefault(); try { localStorage.removeItem('pk_token') } catch {} location.href = 'index.html'; return; }
+    if (b.id === 'logout') { e.preventDefault(); if (!await ask('Log out?', 'You will need an OTP to log in again.', { ok: 'Yes, log out', danger: true })) return; try { localStorage.removeItem('pk_token') } catch {} location.href = 'index.html'; return; }
     if (b.classList.contains('tab')) return setTab(b.dataset.t);
     if (b.dataset.go) return setTab(b.dataset.go);
-    if (b.dataset.cancel) { if (!confirm('Cancel this order?')) return; await api(`/customer/orders/${b.dataset.cancel}/cancel`, { method: 'POST' }); toast('Order cancelled'); return load(); }
+    if (b.dataset.cancel) { if (!await ask('Cancel this order?', 'The order will be cancelled and any amount charged is refunded to your wallet.', { ok: 'Yes, cancel order', danger: true })) return; await api(`/customer/orders/${b.dataset.cancel}/cancel`, { method: 'POST' }); toast('Order cancelled'); return load(); }
     if (b.dataset.reorder) { const cart = {}; JSON.parse(b.dataset.reorder).forEach(([id, q]) => cart[id] = q); lsSet('pk_cart', JSON.stringify(cart)); location.href = 'index.html'; return; }
-    if (b.dataset.resume) { await api(`/customer/pauses/${b.dataset.resume}/resume`, { method: 'POST' }); toast('Deliveries resumed'); return load(); }
-    if (b.dataset.stop) { if (!confirm('Stop this subscription? Deliveries end from the next available day.')) return; await api(`/customer/subscriptions/${b.dataset.stop}/cancel`, { method: 'POST', body: {} }); toast('Subscription stopped'); return load(); }
+    if (b.dataset.resume) { if (!await ask('Resume deliveries?', 'Milk deliveries will start again on the paused days.', { ok: 'Yes, resume' })) return; await api(`/customer/pauses/${b.dataset.resume}/resume`, { method: 'POST' }); toast('Deliveries resumed'); return load(); }
+    if (b.dataset.stop) { if (!await ask('Stop this subscription?', 'Deliveries end from the next available day. You can start a new plan any time.', { ok: 'Yes, stop it', danger: true })) return; await api(`/customer/subscriptions/${b.dataset.stop}/cancel`, { method: 'POST', body: {} }); toast('Subscription stopped'); return load(); }
     if (b.dataset.pause) return modal('Pause deliveries', `<label>From</label><input id="pf" type="date" value="${firstDay()}" min="${firstDay()}"><label>To (leave empty to pause until you resume)</label><input id="pt" type="date" min="${firstDay()}"><div style="margin-top:16px"><button class="btn block" id="doPause" data-id="${b.dataset.pause}">Pause</button></div>`);
-    if (b.id === 'doPause') { const body = { from_date: $('#pf').value, to_date: $('#pt').value || undefined }; if (b.dataset.id !== 'all') body.subscription_id = +b.dataset.id; await api('/customer/pauses', { method: 'POST', body }); close(); toast('Paused'); return load(); }
+    if (b.id === 'doPause') { if (!await ask('Pause deliveries?', 'No milk will be delivered on these days.', { ok: 'Yes, pause', danger: true })) return; const body = { from_date: $('#pf').value, to_date: $('#pt').value || undefined }; if (b.dataset.id !== 'all') body.subscription_id = +b.dataset.id; await api('/customer/pauses', { method: 'POST', body }); close(); toast('Paused'); return load(); }
     if (b.dataset.qty) return modal('Change one day', `<div class="msg i">Set a different quantity for one day. Use 0 to skip that day.</div><label>Date</label><input id="qd" type="date" value="${firstDay()}" min="${firstDay()}"><label>Quantity (0 = skip)</label><input id="qq" type="number" min="0" max="50" value="0"><div style="margin-top:16px"><button class="btn block" id="doQty" data-id="${b.dataset.qty}">Save</button></div>`);
-    if (b.id === 'doQty') { await api(`/customer/subscriptions/${b.dataset.id}/quantity`, { method: 'POST', body: { date: $('#qd').value, quantity: +$('#qq').value } }); close(); toast('Updated'); return load(); }
+    if (b.id === 'doQty') { const z = +$('#qq').value === 0; if (!await ask(z ? 'Skip this day?' : 'Change quantity?', z ? 'No delivery on ' + $('#qd').value + '.' : 'New quantity ' + $('#qq').value + ' on ' + $('#qd').value + '.', { ok: z ? 'Yes, skip' : 'Yes, change', danger: z })) return; await api(`/customer/subscriptions/${b.dataset.id}/quantity`, { method: 'POST', body: { date: $('#qd').value, quantity: +$('#qq').value } }); close(); toast('Updated'); return load(); }
     if (b.dataset.plan) {
       const r = await api('/customer/trial-plans'); const p = (r.data || r).find(x => x.id == b.dataset.plan);
       return modal('Start ' + p.name, `<div class="msg i">${p.total_days} days · ${p.quantity}/day · ${inr(p.total)} (charged from your wallet day by day)</div><label>Start date</label><input id="sd" type="date" value="${firstDay()}" min="${firstDay()}"><div style="margin-top:16px"><button class="btn block" id="doPlan" data-id="${p.id}" data-prod="${p.product?.id}" data-q="${p.quantity}">Start plan</button></div>`);
     }
-    if (b.id === 'doPlan') { await api('/customer/subscriptions', { method: 'POST', body: { trial_plan_id: +b.dataset.id, product_id: +b.dataset.prod, pattern: 'daily', quantity: +b.dataset.q, start_date: $('#sd').value } }); close(); toast('Plan started 🎉'); return setTab('subs'); }
+    if (b.id === 'doPlan') { if (!await ask('Start this plan?', 'Deliveries begin on ' + $('#sd').value + ' and are charged from your wallet.', { ok: 'Yes, start' })) return; await api('/customer/subscriptions', { method: 'POST', body: { trial_plan_id: +b.dataset.id, product_id: +b.dataset.prod, pattern: 'daily', quantity: +b.dataset.q, start_date: $('#sd').value } }); close(); toast('Plan started 🎉'); return setTab('subs'); }
   } catch (err) { toast(err.message); }
 });
 $('#m').addEventListener('click', e => { if (e.target.id === 'm') close(); });
