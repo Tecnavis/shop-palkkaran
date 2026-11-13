@@ -54,6 +54,10 @@ input[type=text],input[type=tel],input[type=number],input[type=date],select,text
 input:focus,select:focus,textarea:focus{outline:2px solid var(--violet);border-color:transparent}
 .msg{padding:10px 14px;border-radius:12px;margin:10px 0;font-size:14px}.msg.e{background:#fee2e2;color:#991b1b}.msg.o{background:#dcfce7;color:#166534}.msg.i{background:var(--lav);color:var(--violet-700)}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:999px;z-index:80;transition:.3s;font-weight:600}.toast.show{transform:translateX(-50%)}
+.bn{position:relative;margin:4px 0 14px}.bn-track{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;border-radius:20px}.bn-track::-webkit-scrollbar{display:none}
+.bn-item{flex:0 0 100%;scroll-snap-align:center;aspect-ratio:12/5;border-radius:20px;overflow:hidden;background:#f3f0ff;border:0;padding:0;cursor:pointer;box-shadow:0 6px 20px rgba(91,70,230,.15)}.bn-item img{width:100%;height:100%;object-fit:cover;display:block}
+.bn-dots{display:flex;justify-content:center;gap:6px;margin-top:8px}.bn-dots i{width:7px;height:7px;border-radius:4px;background:#d8d2f7;transition:.2s}.bn-dots i.on{width:20px;background:#6c4df0}
+@media(min-width:900px){.bn-item{flex-basis:calc(50% - 6px)}}
 .skel{height:300px;border-radius:var(--r);background:linear-gradient(90deg,#f3f0ff,#fff,#f3f0ff);background-size:200% 100%;animation:sk 1.2s infinite}@keyframes sk{to{background-position:-200% 0}}
 footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:14px}
 .modal{position:fixed;inset:0;display:none;place-items:center;z-index:60;padding:16px}.modal.show{display:grid}.modal .box{background:#fff;border-radius:22px;padding:24px;width:min(460px,100%);max-height:92vh;overflow:auto}
@@ -82,6 +86,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
 
 <main class="wrap">
   <section class="hero"><h1>Palkkaran Shop</h1><p>Farm-fresh milk, ghee and dairy. Add to cart, log in with your mobile number and we deliver to your doorstep.</p></section>
+  <div class="bn" id="bn" hidden><div class="bn-track" id="bnTrack"></div><div class="bn-dots" id="bnDots"></div></div>
   <div class="tools" style="margin-bottom:0"><div id="area" style="flex:1;min-width:260px"></div></div>
   <div class="tools"><input class="search" id="q" type="search" placeholder="Search products…"></div>
   <div class="chips" id="chips"></div>
@@ -180,13 +185,38 @@ async function checkPin(pin) {
 }
 
 /* ---------- catalogue ---------- */
+let bnTimer = null;
+async function loadBanners() {
+  try {
+    const r = await api('/customer/catalog/banners', { auth: !!token });
+    const list = (r.data || r || []).filter(b => b.image);
+    if (!list.length) { $('#bn').hidden = true; return; }
+    $('#bnTrack').innerHTML = list.map((b, i) => `<button class="bn-item" data-i="${i}" aria-label="${esc(b.title)}"><img src="${esc(b.image)}" alt="${esc(b.title)}" loading="${i ? 'lazy' : 'eager'}"></button>`).join('');
+    $('#bnDots').innerHTML = list.length > 1 ? list.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('') : '';
+    $('#bn').hidden = false;
+    const tr = $('#bnTrack');
+    tr.onclick = e => { const it = e.target.closest('.bn-item'); if (it) bannerTap(list[+it.dataset.i]); };
+    const sync = () => { const w = tr.firstElementChild.getBoundingClientRect().width + 12; const i = Math.round(tr.scrollLeft / w); [...$('#bnDots').children].forEach((d, k) => d.classList.toggle('on', k === i)); };
+    tr.onscroll = sync;
+    clearInterval(bnTimer);
+    if (list.length > 1) bnTimer = setInterval(() => { const w = tr.firstElementChild.getBoundingClientRect().width + 12; tr.scrollTo({ left: tr.scrollLeft + w >= tr.scrollWidth - 8 ? 0 : tr.scrollLeft + w, behavior: 'smooth' }); }, 5000);
+  } catch { $('#bn').hidden = true; }
+}
+function bannerTap(b) {
+  const v = b.link_value;
+  if (b.link_type === 'url' && v) window.open(v, '_blank', 'noopener');
+  else if (b.link_type === 'category') { catId = +v || 0; renderChips(); renderGrid(); $('#chips').scrollIntoView({ behavior: 'smooth' }); }
+  else if (b.link_type === 'product') { search = (products.find(p => p.id == v)?.name) || ''; $('#q').value = search; renderGrid(); $('#grid').scrollIntoView({ behavior: 'smooth' }); }
+  else if (b.link_type === 'plan') { if (token) location.href = 'account.html#plans'; else { authPhone('Log in to claim this offer'); } }
+  else if (b.link_type === 'page' && v) window.open('https://www.palkkaran.in/' + v, '_blank', 'noopener');
+}
 async function loadCatalog() {
   try {
     const [c, p, conf] = await Promise.all([api('/customer/catalog/categories'), api('/customer/catalog/products?type=one_time'), api('/config').catch(() => null)]);
     cats = c.data || c; products = p.data || p; cfg = conf;
     // drop cart items that no longer exist
     Object.keys(cart).forEach(id => { if (!products.find(x => x.id == id)) delete cart[id]; });
-    renderChips(); renderGrid(); renderCartN(); renderArea();
+    renderChips(); renderGrid(); renderCartN(); renderArea(); loadBanners();
   } catch (e) { $('#grid').innerHTML = '<div class="empty" style="grid-column:1/-1">' + esc(e.message) + '<br><br><button class="btn" onclick="location.reload()">Retry</button></div>'; }
 }
 function renderChips() {
@@ -262,7 +292,7 @@ async function verify() {
   b.disabled = true; b.textContent = 'Verifying…';
   try {
     const r = await api('/customer/auth/verify', { method: 'POST', body: { phone, otp, name, platform: 'web' } });
-    token = r.token; store.set('pk_token', token); me = r.customer.data || r.customer; updateNav(); modal('#authM', false); toast('Logged in');
+    token = r.token; store.set('pk_token', token); me = r.customer.data || r.customer; updateNav(); modal('#authM', false); toast('Logged in'); loadBanners();
     cart && Object.keys(cart).length ? startCheckout() : null;
   } catch (e) { authOtp(phone, isNew, e.message); }
 }
