@@ -6,7 +6,7 @@
 <title>Palkkaran Shop | Fresh milk &amp; dairy delivered</title>
 <meta name="description" content="Order fresh farm milk, ghee and dairy products from Palkkaran online.">
 <meta name="theme-color" content="#6c5cf5">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%236c5cf5'/%3E%3Cpath d='M16 6s-7 8-7 12.5a7 7 0 0 0 14 0C23 14 16 6 16 6z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png"><link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -71,6 +71,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
 .swal .bt{display:flex;gap:10px}.swal .bt button{flex:1;border:0;border-radius:999px;padding:12px;font-weight:700;cursor:pointer;background:var(--lav);color:var(--violet-700)}
 .swal .bt button.go{background:var(--violet);color:#fff}.swal.danger .bt button.go{background:#dc2626}
 </style>
+<script src="pk-ui.js" data-img="img/"></script>
 </head>
 <body>
 <header><div class="wrap bar">
@@ -155,12 +156,12 @@ async function api(path, { method = 'GET', body, auth = false } = {}) {
       break; }
     catch { r = null; }
   }
-  if (!r) throw new Error('Cannot reach the server (network or CORS). Please try again in a moment.');
+  if (!r) { const ne = new Error('Cannot reach the server (network or CORS). Please try again in a moment.'); ne.kind = navigator.onLine === false ? 'offline' : 'server'; throw ne; }
   let j = null; try { j = await r.json(); } catch {}
   if (r.status === 401 && auth) { logout(true); throw new Error('Please log in again.'); }
   if (!r.ok) {
     const first = j && j.errors ? Object.values(j.errors)[0][0] : null;
-    throw new Error(first || (j && j.message) || 'Something went wrong (' + r.status + ')');
+    const he = new Error(first || (j && j.message) || 'Something went wrong (' + r.status + ')'); he.status = r.status; throw he;
   }
   return j;
 }
@@ -217,7 +218,7 @@ async function loadCatalog() {
     // drop cart items that no longer exist
     Object.keys(cart).forEach(id => { if (!products.find(x => x.id == id)) delete cart[id]; });
     renderChips(); renderGrid(); renderCartN(); renderArea(); loadBanners();
-  } catch (e) { $('#grid').innerHTML = '<div class="empty" style="grid-column:1/-1">' + esc(e.message) + '<br><br><button class="btn" onclick="location.reload()">Retry</button></div>'; }
+  } catch (e) { const k = pkKind(e); $('#grid').innerHTML = pkError(k, { retry: 'location.reload()', detail: k === 'generic' && e.message && e.message.length < 140 ? e.message : '' }); }
 }
 function renderChips() {
   const all = [{ id: 0, name: 'All' }, ...cats];
@@ -226,7 +227,7 @@ function renderChips() {
 function renderGrid() {
   const q = search.trim().toLowerCase();
   const list = products.filter(p => (!catId || p.category_id === catId) && (!q || (p.name + ' ' + (p.name_ml || '')).toLowerCase().includes(q)));
-  if (!list.length) { $('#grid').innerHTML = '<div class="empty" style="grid-column:1/-1">No products found.</div>'; return; }
+  if (!list.length) { $('#grid').innerHTML = pkEmpty('No products found. Try another search or category.', { title: 'Nothing here yet' }); return; }
   $('#grid').innerHTML = list.map(p => {
     const off = p.mrp > p.price ? Math.round((1 - p.price / p.mrp) * 100) : 0;
     const n = cart[p.id] || 0;
@@ -248,7 +249,7 @@ function openPanel() { renderCart(); $('#cart').classList.add('show'); $('#ov').
 function closePanel() { $('#cart').classList.remove('show'); $('#ov').classList.remove('show'); }
 function renderCart() {
   const ids = Object.keys(cart);
-  if (!ids.length) { $('#cartBody').innerHTML = '<div class="empty">Your cart is empty.</div>'; $('#cartFt').innerHTML = ''; return; }
+  if (!ids.length) { $('#cartBody').innerHTML = pkEmpty('Add something fresh to get started.', { title: 'Your cart is empty' }); $('#cartFt').innerHTML = ''; return; }
   $('#cartBody').innerHTML = ids.map(id => { const p = products.find(x => x.id == id); if (!p) return '';
     return `<div class="line"><div class="n">${esc(p.name)}<div class="unit">${esc(p.unit_label || '')} · ${inr(p.price)}</div></div>
       <div class="qty" style="min-width:104px"><button data-dec="${id}">−</button><b>${cart[id]}</b><button data-inc="${id}">+</button></div><b>${inr(p.price * cart[id])}</b></div>`; }).join('');
@@ -396,8 +397,8 @@ async function showOrders() {
   try {
     const r = await api('/customer/orders', { auth: true }); const list = r.data || [];
     $('#ordB').innerHTML = list.length ? list.map(o => `<div class="line" style="display:block"><div class="row"><b>${esc(o.number)}</b><span>${inr(o.total)}</span></div>
-      <div class="unit">${esc(o.delivery_date)} · ${esc(o.status)}</div><div class="unit">${(o.items || []).map(i => esc(i.product?.name) + ' × ' + i.quantity).join(', ')}</div></div>`).join('') : '<div class="empty">No orders yet.</div>';
-  } catch (e) { $('#ordB').innerHTML = `<div class="msg e">${esc(e.message)}</div>`; }
+      <div class="unit">${esc(o.delivery_date)} · ${esc(o.status)}</div><div class="unit">${(o.items || []).map(i => esc(i.product?.name) + ' × ' + i.quantity).join(', ')}</div></div>`).join('') : pkEmpty('Your orders will appear here once you place one.', { title: 'No orders yet' });
+  } catch (e) { $('#ordB').innerHTML = pkError(pkKind(e)); }
 }
 
 /* ---------- events ---------- */
